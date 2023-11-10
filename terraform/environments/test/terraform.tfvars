@@ -10,7 +10,7 @@ resource_group = "Azuredevops"
 application_type = "myApplication"
 
 # Network
-virtual_network_name = "myLinuxVM-vnet"
+virtual_network_name = "myLinuxVM"
 address_space = ["10.0.0.0/16"]
 address_prefix_test = "10.0.0.0/24"
 
