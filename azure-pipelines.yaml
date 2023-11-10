@@ -7,7 +7,7 @@ pool: myAgentPool
 
 variables:
   python.version: '3.9.14'
-  azureServiceConnectionId: 'AzureDevOpsConnection'
+  azureServiceConnectionId: 'myflaskconnection'
   projectRoot: $(System.DefaultWorkingDirectory)
   environmentName: 'truonglv9Devops'
 
