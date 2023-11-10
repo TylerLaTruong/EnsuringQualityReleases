@@ -17,12 +17,11 @@ pool:
 
 stages:
 #--------------------------------------------#  
-# BUILD STAGE
+# BUILD
 #--------------------------------------------#    
 - stage: Build
   jobs:
   - job: BuildInfrastructureWithTerraform
-    condition: true
     steps:
     #--------------------------------------------#  
     # Use Terraform to create the Infrastructure      
@@ -41,9 +40,9 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
         backendServiceArm: '$(azureServiceConnectionId)'
         backendAzureRmResourceGroupName: 'Azuredevops'
-        backendAzureRmStorageAccountName: 'tfstate270895'
-        backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'test.terraform.tfstate'
+        backendAzureRmStorageAccountName: 'storagehiepnd2022'
+        backendAzureRmContainerName: 'storage'
+        backendAzureRmKey: 'test.terraform.storage'
    
     - task: TerraformTaskV3@3
       displayName: 'Terraform validate'
@@ -64,11 +63,11 @@ stages:
     # Postman - Install Newman    
     # ToDo: Update the command and verify the working directory
   
-  - job: UploadArtifactForVmAndAppService
+  - job: PublishArtifact
     displayName: 'Publish artifacts: Selenium tests, FakeRestAPI code'
     dependsOn: BuildInfrastructureWithTerraform
-    condition: true
     steps:
+
     #--------------------------------------------#
     # Selenium (UI) Test Suite - Archive the package  
     # "ArchiveFiles@2" picks up the web package and archives it.
@@ -90,7 +89,7 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive FakeRestAPI code'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
@@ -100,10 +99,9 @@ stages:
       artifact: drop-fakerestapi
     
 #--------------------------------------------#  
-# DEPLOYMENT STAGE
+# DEPLOYMENT
 #--------------------------------------------#    
 - stage: Deploy
-  condition: true
   jobs:
   #--------------------------------------------#  
   # Deploy FakeRestAPI Web App
@@ -145,7 +143,6 @@ stages:
             inputs:
               targetType: 'inline'
               script: |           
-                pwd
                 pip3 install selenium
                 wget https://chromedriver.storage.googleapis.com/107.0.5304.62/chromedriver_linux64.zip
                 unzip chromedriver_linux64.zip 
@@ -159,25 +156,24 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                echo '------------> current path' 
-                pwd
                 unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-ui-tests.zip -d .
-                echo '------------> list of file' 
-                ls
-                python3 login.py > ui-logs.log
-                ls
+                python3 login.py > ui-logs$(Build.BuildId).log
+                sudo mkdir /var/logs
+                sudo mkdir /var/logs/selenium
+                sudo cp ui-logs$(Build.BuildId).log /var/logs/selenium
+                echo '------------> Copy log files to folder log successfully'
+                sudo ls /var/logs/selenium
               workingDirectory: $(System.DefaultWorkingDirectory)
           - task: PublishPipelineArtifact@1
             displayName: Publish selenium logs
             inputs:
-              targetPath: '$(System.DefaultWorkingDirectory)/ui-logs.log'
+              targetPath: '$(System.DefaultWorkingDirectory)/ui-logs$(Build.BuildId).log'
               artifactName: 'drop-selenium-logs'
                 
 #--------------------------------------------#  
-# TEST STAGE
+# TEST
 #--------------------------------------------#    
 - stage: Test
-  condition: true
   jobs:
   - job: TestWithPostman
     displayName: 'Test with Postman'
@@ -232,36 +228,46 @@ stages:
     displayName: 'Test with Jmeter'
     steps:
     #--------------------------------------------#    
-    # Run JMeter test suite against the App Service
+    # Run JMeter test
     - task: CmdLine@2
       displayName: 'Run Jmeter'
       inputs:
         script: |
-          echo '-------> Path:'
-          pwd
-
           echo '-------> Cleanning old data...'
           rm -rf tests
           echo '-------> Cleanned old data'
-          
-          export PATH=$PATH:/home/truonglv9/Desktop/Tools/apache-jmeter-5.5/bin 
+          export PATH=/home/truonglv9/jmeter/bin:$PATH
           echo '-------> path with jmeter:' $PATH
-          
-          echo '-------> jmeter testing...'
-          jmeter -n -t Starter.jmx \
-            -l logs/test-output.csv \
-            -e -f -o logs/test-log.html \
-            -j logs/jmeter.log
-          echo '-------> jmeter tested'
+          echo '-------> create jmeter stress test ...'
+          jmeter -n -t stress-test.jmx \
+            -l logs/stress-test-output.csv \
+            -e -f -o logs/stress-test-log \
+            -j logs/stress-test.log
+
+          echo '-------> crete jmeter endurance test ...'
+          jmeter -n -t endurance-test.jmx \
+            -l logs/endurance-test-output.csv \
+            -e -f -o logs/endurance-test-log \
+            -j logs/endurance-test.log
+
+          echo '-------> jmeter completed'
 
         workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter'
     - task: ArchiveFiles@2
-      displayName: Archive JMeter HTML report
+      displayName: Archive stress test HTML report
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/logs'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/logs/stress-test-log'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/logs/jmeter/jmeter-html-report-$(Build.BuildId).zip'
+        archiveFile: '$(System.DefaultWorkingDirectory)/logs/jmeter/jmeter-stress-test-html-report-$(Build.BuildId).zip'
+        verbose: true
+    - task: ArchiveFiles@2
+      displayName: Archive endurance HTML report
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/logs/endurance-test-log'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(System.DefaultWorkingDirectory)/logs/jmeter/jmeter-endurance-test-html-report-$(Build.BuildId).zip'
         verbose: true
     - task: PublishPipelineArtifact@1
       displayName: Publish JMeter logs
