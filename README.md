@@ -61,3 +61,8 @@ Udacity final project Ensuring Quality Releases
 - Azure Log Analytics
   - Screenshots of log analytics queries and result sets which will show specific output of the Azure resource
     ![Screenshot_15_LogAnalytics_Queries.png](screenshots/Screenshot_15_LogAnalytics_Queries.png)
+
+    Note: if you udacity account lab, when run terraform apply in pipeline very long time because resourec group locked you need unlock follow step in local:
+
+    `$ terraform init`
+    `$ terraform import modules.resource_group.azurerm_resource_group.test /subscriptions/subscriptionid/resourceGroups/AzureDevops` 
