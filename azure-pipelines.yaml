@@ -3,7 +3,7 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 trigger:
   - master
 
-pool: Default
+pool: myAgentPool
 
 variables:
   python.version: '3.9.14'
@@ -50,7 +50,7 @@ stages:
     jobs:
       - job: Build
         pool:
-          name: Default
+          name: myAgentPool
         steps:
           - task: ArchiveFiles@2
             displayName: 'Archive FakeRestAPI'
@@ -77,8 +77,8 @@ stages:
     jobs:
       - deployment: DeployFakeRestAPI
         pool:
-          name: Default
-        environment: 'UdacityAzureDevOps3Environment'
+          name: myAgentPool
+        environment: 'test-vm'
         strategy:
           runOnce:
             deploy:
@@ -93,7 +93,7 @@ stages:
                     deploymentMethod: 'auto'
       - deployment: DeployVirtualMachine
         environment:
-          name:  'UdacityAzureDevOps3Environment'
+          name:  'test-vm'
           resourceType: VirtualMachine
         strategy:
           runOnce:
@@ -134,7 +134,7 @@ stages:
     jobs:
       - deployment: SeleniumTests
         environment:
-          name:  'UdacityAzureDevOps3Environment'
+          name:  'test-vm'
           resourceType: VirtualMachine
         strategy:
           runOnce:
