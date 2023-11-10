@@ -20,13 +20,13 @@ resource "azurerm_linux_virtual_machine" "test" {
   network_interface_ids = [azurerm_network_interface.test.id]
   admin_ssh_key {
     username   = var.admin_username
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzUoDgAB5iGrBIpK8X+HufpzV/RVItXqe2S5nfLrA4W4kXG4coE26pUxNLcm/dWen+w51AnCXSl924rzLSjD7CpX3MgSyYO6GukouXJXLVzFlT50pAfSy8qumQwWq5Log9cffWHmo/Dm3OaxdsGWpUsYP/X5vDRDRVMfxVeSRBInDcPMMZRFFCfo7WQUUxRxG8MimtYoNdy8Dcy7tSXG701gN18ZsbzWuD8JIX6xEMbgwJQxpoSUTEvuDk7voGhoK1c41OJh+Qfi0J7LPQB9AiBHVZhC226TxKDnXrLlnmJIsXwDDccxw94fcDWulW2jf7CBNb355ROQzYW1hEtAwLJWJd7+rCcKwnKaNDGoik++9Kd9yTFvihQ83rfW26sv6kphqgiLv26XnRq2WdUXqy/zs0I2E8AuIUj2ra2o5uc0Fo/Xw6FlywQAXmNfH6ouwGOnJn3gMSDdVTy569MsZVKcCLkJTGeg4P8wLx016RLO7ZlGaVOQXpQE0bpZPyVjk= generated-by-azure"
+    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCw/NcM4Ec0waiaxTt01dcneRTRB4oOcIdmmFYTOwrcLzw07BlYTagJHeb9ykuOmmaHBK4VaiEUYyOAz9zXD/V93N5wZneo88LP6Ck+JWzRdJEoC1c67QUK3zKnpRo/LUuqLom0QUTHT2HI8oLiXtkFolIHsMEoF4fdGAvO8XJOsat/vQ6RD0coBsYsqtoGAFLw8AglqQB43Ld06rPPlOZyeNNJbiiM40R7sml4l9kgBd4pWofOcyCzDu/D7banlDXcBZPVQtPkfflFT+Fi1zrVa3iYhtlUn6K5UN/LdiTGm8EsLm69SlqYzhuQUf7C28AHQhzaanIFKcbEKGPoldcgddZr979W5FxcTTAFExI0JAdnOy9dUcyrzowmwkVzqI5zeA9wA1CgoYz4H5cZ6NJGFfoJ7fSEFQWd4HvMuD1McKQeHmXQXQkdopZW145FLDqeI492VLEFJy/a6MWS17nWwulgFotMgEGDRtBCl8nmMnvRsDXVCC0mcJbmNKYzkLC7+NwSvWZkIO2hm3yqre+HDnMzBHJendHaTOiX2q4+7DTfeYJG4hQG4pAIDRjlkqnbPAqA4ibyCDUJmNUgmPZsrRbe4WKpD9TrLd1MbSrWdbI6HvKGu14b5XDkWjjWE9eZyy4mEZG5yO6ygO8847Yd+KG4JS9BMIywcCdhO+XO6w== fsoft.fpt.vn\truonglv9@Temp-TruongLV9"
   }
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
   source_image_reference {
-    id = "/subscriptions/82c40d1f-be09-4c9e-9295-ae70e625b7b5/resourceGroups/Azuredevops/providers/Microsoft.Compute/galleries/UdacityAzureDevOps3Gallery/images/UdacityAzureDevOps3Image/versions/0.0.1"
+    id = "/subscriptions/e7a256dc-769a-421c-9f8e-e283ed3cbefa/resourceGroups/Azuredevops/providers/Microsoft.Compute/galleries/UdacityAzureDevOps3Gallery/images/UdacityAzureDevOps3Image/versions/0.0.1"
   }
 }
