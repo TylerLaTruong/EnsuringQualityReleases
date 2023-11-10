@@ -17,3 +17,7 @@ address_prefix_test = "10.0.0.0/24"
 # Virtual machine
 vm_username = "devopsagent"
 vm_password = "DevOpsAgent@123"
+
+#Image name
+image_name = "ubuntu2004"
+
