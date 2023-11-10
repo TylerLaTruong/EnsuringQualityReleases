@@ -5,7 +5,7 @@ client_secret = "FqB8Q~A0To9u.VcsOj3RH4zxywIDBckg6ELLObUr"
 tenant_id = "f958e84a-92b8-439f-a62d-4f45996b6d07"
 
 # Resource Group/Location
-location = "South Central US"
+location = "West Europe"
 resource_group = "Azuredevops"
 application_type = "myApplication"
 
