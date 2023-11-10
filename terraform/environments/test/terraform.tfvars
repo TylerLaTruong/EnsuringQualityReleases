@@ -19,5 +19,4 @@ vm_username = "devopsagent"
 vm_password = "DevOpsAgent@123"
 
 #Image name
-image_name = "ubuntu2004"
-
+# image_name = "ubuntu2004"
