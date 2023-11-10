@@ -27,7 +27,7 @@ stages:
               workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
               backendServiceArm: '$(azureServiceConnectionId)'
               backendAzureRmResourceGroupName: 'Azuredevops'
-              backendAzureRmStorageAccountName: 'tfstate1811116080'
+              backendAzureRmStorageAccountName: 'tfstate270895'
               backendAzureRmContainerName: 'tfstate'
               backendAzureRmKey: 'test.terraform.tfstate'
 
