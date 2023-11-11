@@ -223,6 +223,8 @@ stages:
           testResultsFormat: 'JUnit'
           testResultsFiles: '$(System.DefaultWorkingDirectory)/Results/*.xml'
 
+- stage: JMeterTests
+  jobs:
   - job: JMeterTests
     pool:
         vmImage: 'ubuntu-latest'
