@@ -7,7 +7,7 @@ tenant_id = "c47d3cb8-23ee-4013-a436-3bbc1c71a400"
 # Resource Group/Location
 location = "East Asia"
 resource_group = "Azuredevops"
-application_type = "myApplication"
+application_type = "myApplicationTruonglv9"
 
 # Network
 virtual_network_name = "myLinuxVM"
