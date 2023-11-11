@@ -181,7 +181,7 @@ stages:
                   inputs:
                       targetType: 'inline'
                       script: |
-                          unzip -o $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-ui-tests.zip -d .
+                          unzip -o $(Pipeline.Workspace)/selenium/$(Build.BuildId)-ui-tests.zip -d .
                           sudo mkdir -p /var/logs
                           python3 uitests.py > ui-logs.log
                           cat ui-logs.log
