@@ -89,7 +89,7 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive FakeRestAPI code'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
@@ -126,170 +126,123 @@ stages:
  # ToDo: 
   - deployment: DeployVirtualMachine
     environment:
-        name: '$(environmentName)'
-        resourceType: VirtualMachine
-    strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: Bash@3
-                  displayName: 'Install Dependencies'
-                  inputs:
-                    targetType: 'inline'
-                    script: |
-                      #! /bin/bash
-
-                      sudo apt-get upgrade -y
-                      sudo apt-get install python3-pip -y
-                      sudo apt-get install unzip -y
-                      sudo apt-get install -y chromium-browser
-                      pip3 install selenium
-
-                      # download chrome driver
-                      FILE=chromedriver_linux64.zip
-                      if [ -f "$FILE" ]; then
-                        echo "$FILE exists."
-                      else
-                        wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
-                      fi
-                      # install chrome driver
-                      unzip chromedriver_linux64.zip
-                      sudo mv chromedriver /usr/bin/chromedriver
-                      sudo chown root:root /usr/bin/chromedriver
-                      sudo chmod +x /usr/bin/chromedriver
-                      chromium-browser -version
-                      chromedriver --version
-                      # install Log Analytics Agent
-                      wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w cbe0ec30-c458-41a4-9b6b-421205cf995e -s CI/JBZBRaayR6cbyEZVvFucqeRXRNVICiKRk1GUczQcAb+kQ+hIReFxRJ2AComJs55gkmkXRrvJEwTKAsmL9gA== -d opinsights.azure.com
-
-
-- stage: SeleniumTests
-  jobs:
-  - deployment: SeleniumTests
-    environment:
-      name: '$(environmentName)'
+      name:  '$(environmentName)'
       resourceType: VirtualMachine
     strategy:
       runOnce:
         deploy:
           steps:
-            - download: current
-              displayName: 'Download Selenium'
-              artifact: drop-ui-tests
-            - script: echo "Contents of $(Pipeline.Workspace)/drop-ui-tests" && ls $(Pipeline.Workspace)/drop-ui-tests
-              displayName: 'Print Selenium Contents'
-            - task: Bash@3
-              displayName: 'Install Dependencies and Run UI Tests'
-              inputs:
-                targetType: 'inline'
-                script: |
-                  unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-ui-tests.zip -d .
-                  sudo mkdir -p /var/logs
-                  python3 uitests.py > ui-logs.log
-                  cat ui-logs.log
-                  sudo mv ui-logs.log /var/logs
-                
-#--------------------------------------------#  
-# TEST
-#--------------------------------------------#    
-- stage: Test
+          - task: Bash@3
+            displayName: 'Install Dependencies'
+            inputs:
+              targetType: 'inline'
+              script: |
+                #! /bin/bash
+
+                sudo apt-get upgrade -y
+                sudo apt-get install python3-pip -y
+                sudo apt-get install unzip -y
+                sudo apt-get install -y chromium-browser
+                pip3 install selenium
+
+                # download chrome driver
+                FILE=chromedriver_linux64.zip
+                if [ -f "$FILE" ]; then
+                  echo "$FILE exists."
+                else
+                  wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
+                fi
+                # install chrome driver
+                unzip chromedriver_linux64.zip
+                sudo mv chromedriver /usr/bin/chromedriver
+                sudo chown root:root /usr/bin/chromedriver
+                sudo chmod +x /usr/bin/chromedriver
+                chromium-browser -version
+                chromedriver --version
+                # install Log Analytics Agent
+                wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w d05d0510-f15c-4249-a55e-8aca383aa7be -s I8aqLDBfD4hlHvF0QnUdtCn8K0vYZlri+sEp30tWGcQ7BFe7mpzayYoj9cxIOFjZtg/MDabcDnEjcxi18U4gkw== -d opinsights.azure.com
+
+
+- stage: SeleniumTests
   jobs:
-  - job: TestWithPostman
-    displayName: 'Test with Postman'
+    - deployment: SeleniumTests
+      environment:
+          name:  '$(environmentName)'
+          resourceType: VirtualMachine
+      strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  displayName: 'Download Selenium'
+                  artifact: selenium
+                - task: Bash@3
+                  displayName: UI Tests
+                  inputs:
+                      targetType: 'inline'
+                      script: |
+                          unzip -o $(Pipeline.Workspace)/selenium/selenium-tests.zip -d .
+                          sudo mkdir -p /var/logs
+                          python3 uitests.py > ui-logs.log
+                          cat ui-logs.log
+                          sudo mv ui-logs.log /var/logs
+
+- stage: PostmanTests
+  jobs:
+  - job: PostmanTests
     steps:
-    - task: CmdLine@2
-      displayName: Install Newman
-      inputs:
-        script: |
-          mkdir ~/.npm-global
-          npm config set prefix '~/.npm-global'
-          export PATH=~/.npm-global/bin:$PATH
-          source ~/.profile
-          npm install -g newman
-        workingDirectory: $(System.DefaultWorkingDirectory)
+      - task: NodeTool@0
+        displayName: Install Node v16.X
+        inputs:
+          versionSpec: '16.x'
+      - task: CmdLine@2
+        displayName: Install Newman
+        inputs:
+          script: 'npm install -g newman'
+          workingDirectory: '$(System.DefaultWorkingDirectory)'
+      - task: CmdLine@2
+        displayName: Run Regression Tests
+        inputs:
+          script: 'newman run automatedtesting/postman/RegressionTestSuite.json -e automatedtesting/postman/RegressionTestSuite.Environment.json --delay-request 5000 --bail newman -x --reporters cli,junit --reporter-junit-export Results/RegressionTests.xml'
+          workingDirectory: '$(System.DefaultWorkingDirectory)'
+        continueOnError: true
+      - task: CmdLine@2
+        displayName: Run Data Validation Tests
+        inputs:
+          script: 'newman run automatedtesting/postman/DataValidationTestSuite.json -e automatedtesting/postman/DataValidationTestSuite.Environment.json --delay-request 5000 --bail newman -x --reporters cli,junit --reporter-junit-export Results/DataValidationTests.xml'
+          workingDirectory: '$(System.DefaultWorkingDirectory)'
+        continueOnError: true
+      - task: CmdLine@2
+        inputs:
+          script: 'ls'
+          workingDirectory: '$(System.DefaultWorkingDirectory)'
+      - task: PublishTestResults@2
+        displayName: Publish Test Reports
+        condition: always()
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: '$(System.DefaultWorkingDirectory)/Results/*.xml'
 
-   # Postman Data Validation Test Suite    
-   # ToDo: Verify the working directory and the newman scripts
-    - task: CmdLine@2
-      displayName: Run Data Validation Tests
-      continueOnError: true
-      inputs:
-        script: |
-          export PATH=~/.npm-global/bin:$PATH
-          chmod 744 ~/.npm-global/bin/newman
-          newman run validation-data-test.json --reporters cli,junit --reporter-junit-export results\validation-data-test.xml
-        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
-
-   # Postman Regression Test Suite    
-   # ToDo: Update the command and verify the working directory
-    - task: CmdLine@2
-      displayName: Run Regression Tests
-      continueOnError: true
-      inputs:
-        script: |
-          export PATH=~/.npm-global/bin:$PATH
-          chmod 744 ~/.npm-global/bin/newman
-          newman run regression-test.json --reporters cli,junit --reporter-junit-export results\regression-test.xml
-        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
-
-   # Postman - Publish Results 
-   # ToDo: Complete the task as explained here: https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/test/publish-test-results?view=azure-devops&tabs=trx%2Cyaml#yaml-snippet
-    - task: PublishTestResults@2
-      displayName: 'Publish test result'
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '**/*-test.xml'
-        #searchFolder: '$(System.DefaultWorkingDirectory)/automatedtesting/postman/results'
-        mergeTestResults: true
-        testRunTitle: 'Postman regression and data validation test'
-  
-  - job: TestWithJmeter
-    displayName: 'Test with Jmeter'
+- stage: JMeterTests
+  jobs:
+  - job: JMeterTests
     steps:
-    #--------------------------------------------#    
-    # Run JMeter test
-    - task: CmdLine@2
-      displayName: 'Run Jmeter'
-      inputs:
-        script: |
-          echo '-------> Cleanning old data...'
-          rm -rf tests
-          echo '-------> Cleanned old data'
-          export PATH=/home/truonglv9/jmeter/bin:$PATH
-          echo '-------> path with jmeter:' $PATH
-          echo '-------> create jmeter stress test ...'
-          jmeter -n -t stress-test.jmx \
-            -l logs/stress-test-output.csv \
-            -e -f -o logs/stress-test-log \
-            -j logs/stress-test.log
+      - task: JMeterInstaller@0
+        inputs:
+          jmeterVersion: '5.2.1'
+      - task: Bash@3
+        displayName: EnduranceTest
+        inputs:
+          targetType: 'inline'
+          script: 'jmeter -n -t automatedtesting/jmeter/EnduranceTestSuite.jmx -Jresdir=automatedtesting/jmeter/endurancepages.csv -l automatedtesting/jmeter/report/enduranceresults.jtl -e -o automatedtesting/jmeter/endurancereport'
+      - task: Bash@3
+        displayName: StressTest
+        inputs:
+          targetType: 'inline'
+          script: 'jmeter -n -t automatedtesting/jmeter/StressTestSuite.jmx -Jresdir=automatedtesting/jmeter/stresspages.csv -l automatedtesting/jmeter/report/stressresults.jtl -e -o automatedtesting/jmeter/stressreport'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'automatedtesting/jmeter'
+          ArtifactName: 'jmeter'
+          publishLocation: 'Container'
 
-          echo '-------> crete jmeter endurance test ...'
-          jmeter -n -t endurance-test.jmx \
-            -l logs/endurance-test-output.csv \
-            -e -f -o logs/endurance-test-log \
-            -j logs/endurance-test.log
-
-          echo '-------> jmeter completed'
-
-        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter'
-    - task: ArchiveFiles@2
-      displayName: Archive stress test HTML report
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/logs/stress-test-log'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/logs/jmeter/jmeter-stress-test-html-report-$(Build.BuildId).zip'
-        verbose: true
-    - task: ArchiveFiles@2
-      displayName: Archive endurance HTML report
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/logs/endurance-test-log'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/logs/jmeter/jmeter-endurance-test-html-report-$(Build.BuildId).zip'
-        verbose: true
-    - task: PublishPipelineArtifact@1
-      displayName: Publish JMeter logs
-      inputs:
-        targetPath: '$(System.DefaultWorkingDirectory)/logs/jmeter'
-        artifactName: 'drop-jmeter-logs'
