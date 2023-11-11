@@ -8,8 +8,8 @@ variables:
   terraformVersion: '1.3.4'
   azureServiceConnectionId: 'myflaskconnection'
   projectRoot: $(System.DefaultWorkingDirectory)
-  environmentName: 'truonglv9Devops'
-  poolName: 'Default'
+  environmentName: 'linux-vm'
+  poolName: 'myAgentPool'
   appName: 'devops-truonglv9-web-app'
 
 pool: 
@@ -40,7 +40,7 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/environments/test'
         backendServiceArm: '$(azureServiceConnectionId)'
         backendAzureRmResourceGroupName: 'Azuredevops'
-        backendAzureRmStorageAccountName: 'tfstate270895'
+        backendAzureRmStorageAccountName: 'tfstatetruonglv9'
         backendAzureRmContainerName: 'tfstate'
         backendAzureRmKey: 'test.terraform.storage'
    
