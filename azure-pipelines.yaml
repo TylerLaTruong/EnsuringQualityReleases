@@ -9,7 +9,7 @@ variables:
   azureServiceConnectionId: 'myflaskconnection'
   projectRoot: $(System.DefaultWorkingDirectory)
   environmentName: 'truonglv9Devops'
-  poolName: 'myAgentpool'
+  poolName: 'Default'
   appName: 'devops-truonglv9-web-app'
 
 pool: 
