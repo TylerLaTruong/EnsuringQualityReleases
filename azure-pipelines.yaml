@@ -121,54 +121,71 @@ stages:
               appType: webApp
               package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip 
               
-  #--------------------------------------------#  
+ #--------------------------------------------#  
  # Selenium | Functional UI Tests
  # ToDo: 
-  - deployment: DeployVM
-    displayName: Deploy VM and execute Selenium tests
-    workspace:
-      clean: all
+  - deployment: DeployVirtualMachine
     environment:
-      name: '$(environmentName)'
-      resourceType: VirtualMachine
-      tags: selenium
+        name: '$(environmentName)'
+        resourceType: VirtualMachine
     strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: 'drop-ui-tests'     # ToDo: Change/provide a name
-            
-          - task: Bash@3
-            inputs:
-              targetType: 'inline'
-              script: |           
-                #! /bin/bash
-                
-                sudo apt-get upgrade -y
-                sudo apt-get install python3-pip -y
-                sudo apt-get install unzip -y
-                sudo apt-get install -y chromium-browser
-                pip3 install selenium
-                cd ~/
-                DIR=/home/testuser/app
-                if [ ! -d "$DIR" ]; then
-                    mkdir app
-                fi
-                mv /home/testuser/azagent/_work/1/drop-uitests/$(Build.BuildId)-uitests.zip app
-                cd app
-                unzip -o $(Build.BuildId)-uitests.zip
-                FILE=/home/testuser/app/chromedriver_linux64.zip
-                if [ ! -f "$FILE" ]; then
-                    LATEST=$(wget -q -O - http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-                    wget http://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip
-                    unzip -o chromedriver_linux64.zip
-                    sudo ln -s $PWD/chromedriver /usr/local/bin/chromedriver
-                fi
-                export PATH=$PATH:/home/testuser/app
-                echo "Starting Selenium Tests"
-                python3 add_remove_from_cart.py >> selenium.log
-                echo "Completed Selenium Tests. Check selenium.log for results."
+          runOnce:
+            deploy:
+              steps:
+                - task: Bash@3
+                  displayName: 'Install Dependencies'
+                  inputs:
+                    targetType: 'inline'
+                    script: |
+                      #! /bin/bash
+
+                      sudo apt-get upgrade -y
+                      sudo apt-get install python3-pip -y
+                      sudo apt-get install unzip -y
+                      sudo apt-get install -y chromium-browser
+                      pip3 install selenium
+
+                      # download chrome driver
+                      FILE=chromedriver_linux64.zip
+                      if [ -f "$FILE" ]; then
+                        echo "$FILE exists."
+                      else
+                        wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
+                      fi
+                      # install chrome driver
+                      unzip chromedriver_linux64.zip
+                      sudo mv chromedriver /usr/bin/chromedriver
+                      sudo chown root:root /usr/bin/chromedriver
+                      sudo chmod +x /usr/bin/chromedriver
+                      chromium-browser -version
+                      chromedriver --version
+                      # install Log Analytics Agent
+                      wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w cbe0ec30-c458-41a4-9b6b-421205cf995e -s CI/JBZBRaayR6cbyEZVvFucqeRXRNVICiKRk1GUczQcAb+kQ+hIReFxRJ2AComJs55gkmkXRrvJEwTKAsmL9gA== -d opinsights.azure.com
+
+
+- stage: SeleniumTests
+  jobs:
+      - deployment: SeleniumTests
+        environment:
+          name:  '$(environmentName)'
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  displayName: 'Download Selenium'
+                  artifact: selenium
+                - task: Bash@3
+                  displayName: UI Tests
+                  inputs:
+                    targetType: 'inline'
+                    script: |
+                      unzip -o $(Pipeline.Workspace)/selenium/selenium-tests.zip -d .
+                      sudo mkdir -p /var/logs
+                      python3 uitests.py > ui-logs.log
+                      cat ui-logs.log
+                      sudo mv ui-logs.log /var/logs
                 
 #--------------------------------------------#  
 # TEST
