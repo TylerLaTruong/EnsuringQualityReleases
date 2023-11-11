@@ -165,27 +165,29 @@ stages:
 
 - stage: SeleniumTests
   jobs:
-      - deployment: SeleniumTests
-        environment:
-          name:  '$(environmentName)'
-          resourceType: VirtualMachine
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  displayName: 'Download Selenium'
-                  artifact: selenium
-                - task: Bash@3
-                  displayName: UI Tests
-                  inputs:
-                    targetType: 'inline'
-                    script: |
-                      unzip -o $(Pipeline.Workspace)/selenium/selenium-tests.zip -d .
-                      sudo mkdir -p /var/logs
-                      python3 uitests.py > ui-logs.log
-                      cat ui-logs.log
-                      sudo mv ui-logs.log /var/logs
+  - deployment: SeleniumTests
+    environment:
+      name: '$(environmentName)'
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: current
+              displayName: 'Download Selenium'
+              artifact: drop-ui-tests
+            - script: echo "Contents of $(Pipeline.Workspace)/drop-ui-tests" && ls $(Pipeline.Workspace)/drop-ui-tests
+              displayName: 'Print Selenium Contents'
+            - task: Bash@3
+              displayName: 'Install Dependencies and Run UI Tests'
+              inputs:
+                targetType: 'inline'
+                script: |
+                  unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-ui-tests.zip -d .
+                  sudo mkdir -p /var/logs
+                  python3 uitests.py > ui-logs.log
+                  cat ui-logs.log
+                  sudo mv ui-logs.log /var/logs
                 
 #--------------------------------------------#  
 # TEST
