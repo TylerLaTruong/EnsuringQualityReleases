@@ -6,7 +6,7 @@ trigger:
 variables:
   python.version: '3.8.10'
   terraformVersion: '1.3.4'
-  azureServiceConnectionId: 'myflaskconnection'
+  azureServiceConnectionId: 'myConnection'
   projectRoot: $(System.DefaultWorkingDirectory)
   environmentName: 'linux-vm'
   poolName: 'newAgentPool'
