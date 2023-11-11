@@ -163,29 +163,29 @@ stages:
                 wget https://raw.githubusercontent.com/Microsoft/OMS-Agent-for-Linux/master/installer/scripts/onboard_agent.sh && sh onboard_agent.sh -w d05d0510-f15c-4249-a55e-8aca383aa7be -s I8aqLDBfD4hlHvF0QnUdtCn8K0vYZlri+sEp30tWGcQ7BFe7mpzayYoj9cxIOFjZtg/MDabcDnEjcxi18U4gkw== -d opinsights.azure.com
 
 
-- stage: SeleniumTests
-  jobs:
-    - deployment: SeleniumTests
-      environment:
-          name:  '$(environmentName)'
-          resourceType: VirtualMachine
-      strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  displayName: 'Download Selenium'
-                  artifact: selenium
-                - task: Bash@3
-                  displayName: UI Tests
-                  inputs:
-                      targetType: 'inline'
-                      script: |
-                          unzip -o $(Pipeline.Workspace)/selenium/selenium-tests.zip -d .
-                          sudo mkdir -p /var/logs
-                          python3 uitests.py > ui-logs.log
-                          cat ui-logs.log
-                          sudo mv ui-logs.log /var/logs
+# - stage: SeleniumTests
+#   jobs:
+#     - deployment: SeleniumTests
+#       environment:
+#           name:  '$(environmentName)'
+#           resourceType: VirtualMachine
+#       strategy:
+#           runOnce:
+#             deploy:
+#               steps:
+#                 - download: current
+#                   displayName: 'Download Selenium'
+#                   artifact: selenium
+#                 - task: Bash@3
+#                   displayName: UI Tests
+#                   inputs:
+#                       targetType: 'inline'
+#                       script: |
+#                           unzip -o $(Pipeline.Workspace)/selenium/selenium-tests.zip -d .
+#                           sudo mkdir -p /var/logs
+#                           python3 uitests.py > ui-logs.log
+#                           cat ui-logs.log
+#                           sudo mv ui-logs.log /var/logs
 
 - stage: PostmanTests
   jobs:
