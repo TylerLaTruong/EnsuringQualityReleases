@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.common.by import By
 
 #datetime.now().strftime("%m-%d-%y %H:%M:%S")
 
@@ -26,9 +27,9 @@ def test_login(driver, user, password):
     print('Login attempt, user: {},  password: {}'.format(user, password))
     
     # Use implicit wait to wait for elements to load
-    user_element = driver.find_element_by_id('user-name')
-    password_element = driver.find_element_by_id('password')
-    login_button_element = driver.find_element_by_id('login-button')
+    user_element = driver.find_element(By.ID, 'user-name')
+    password_element = driver.find_element(By.ID, 'password')
+    login_button_element = driver.find_element(By.ID, 'login-button')
 
     user_element.send_keys(user)
     password_element.send_keys(password)
