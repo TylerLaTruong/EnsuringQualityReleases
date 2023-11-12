@@ -225,37 +225,23 @@ stages:
 
 - stage: JMeterTests
   jobs:
-    - job: Test_Jmeter
-      displayName: Performance testing
-      pool:
-        name: '$(poolName)'
+    - job: JMeterTests
       steps:
-      - bash: |
-          sudo apt-get install openjdk-11-jre-headless -y
-          java -version
-          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.5.tgz -O jmeter.tgz
-          tar xzvf jmeter.tgz
-          echo "####################"
-          echo "jmeter version : " 
-          apache-jmeter-5.5/bin/jmeter --version   
-          echo "####################"
-          mkdir -p log/jmeter
-          pwd
-          ls -la
-          ls '$(Pipeline.Workspace)/s'
-        displayName: Install JMeter
-      - bash: |
-          apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/StressTest.jmx -l log/jmeter/stress-test-result.csv -e -f -o log/jmeter/stress-test-html-report -j log/jmeter/jmeter-stress-test.log
-          cat log/jmeter/jmeter-stress-test.log
-          ls '$(Pipeline.Workspace)/s'
-          ls '$(Pipeline.Workspace)/s/automatedtesting/jmeter'
-        displayName: Stress Test
-      - bash: |
-          apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/EnduranceTest.jmx -l log/jmeter/endurance-test-result.csv -e -f -o log/jmeter/endurance-test-html-report -j log/jmeter/jmeter-endurance-test.log
-          cat log/jmeter/jmeter-endurance-test.log
-        displayName: Endurance Test
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: 'log/jmeter'
-          ArtifactName: 'jmeter'
-          publishLocation: 'Container'  
+        - task: JMeterInstaller@0
+          inputs:
+            jmeterVersion: '5.2.1'
+        - task: Bash@3
+          displayName: EnduranceTest
+          inputs:
+            targetType: 'inline'
+            script: 'jmeter -n -t automatedtesting/jmeter/EnduranceTestSuite.jmx -Jresdir=automatedtesting/jmeter/endurancepages.csv -l automatedtesting/jmeter/report/enduranceresults.jtl -e -o automatedtesting/jmeter/endurancereport'
+        - task: Bash@3
+          displayName: StressTest
+          inputs:
+            targetType: 'inline'
+            script: 'jmeter -n -t automatedtesting/jmeter/StressTestSuite.jmx -Jresdir=automatedtesting/jmeter/stresspages.csv -l automatedtesting/jmeter/report/stressresults.jtl -e -o automatedtesting/jmeter/stressreport'
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: 'automatedtesting/jmeter'
+            ArtifactName: 'jmeter'
+            publishLocation: 'Container'
