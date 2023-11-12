@@ -143,6 +143,7 @@ stages:
                 sudo apt-get install unzip -y
                 sudo apt-get install -y chromium-browser
                 sudo apt-get install libx11-xcb1
+                pip3 install --upgrade urllib3 chardet
                 pip3 install selenium
 
                 # download chrome driver
