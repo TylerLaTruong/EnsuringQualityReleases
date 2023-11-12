@@ -228,7 +228,7 @@ stages:
     - job: Test_Jmeter
       displayName: Performance testing
       pool:
-        name: Azure Pipelines
+        name: '$(poolName)'
       steps:
       - bash: |
           sudo apt-get install openjdk-11-jre-headless -y
