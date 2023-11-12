@@ -145,7 +145,7 @@ stages:
                 sudo apt-get install -y chromium-browser
                 pip3 install selenium
 
-                # download chrome driver
+                # Download chrome driver
                 CHROMIUM_VERSION=$(chromium-browser --version | awk '{print $NF}' | sed 's/\.//g')
                 CHROMEDRIVER_VERSION="119.0.6045.105"
                 CHROMEDRIVER_URL="https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
@@ -157,23 +157,27 @@ stages:
                   wget "$CHROMEDRIVER_URL"
                 fi
 
-                # install chrome driver
+                # Install chrome driver
                 unzip "$CHROMEDRIVER_FILE"
                 sudo mv chromedriver "/usr/bin/chromedriver-$CHROMIUM_VERSION"
                 sudo chown root:root "/usr/bin/chromedriver-$CHROMIUM_VERSION"
                 sudo chmod +x "/usr/bin/chromedriver-$CHROMIUM_VERSION"
+
+                # Remove any existing chromedriver symlink
+                sudo rm /usr/bin/chromedriver
 
                 # Link to the installed Chromedriver
                 sudo ln -fs "/usr/bin/chromedriver-$CHROMIUM_VERSION" /usr/bin/chromedriver
 
                 # Add Chromedriver path to PATH
                 export PATH="/usr/bin/chromedriver-$CHROMIUM_VERSION:$PATH"
+
                 # Display Chromedriver path
                 which chromedriver
 
                 # Display PATH
                 echo $PATH
-                
+
                 # Display Chromium version and Chromedriver version
                 chromium-browser -version
                 chromedriver --version
