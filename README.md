@@ -17,44 +17,43 @@ Udacity final project Ensuring Quality Releases
 
 - Terraform to apply Infrastructure as Code (IaC)
   - Screenshots of the log output of Terraform when executed by the CI/CD pipeline
-   ![Resources_Created_By_Terraform.png](screenshots/Resources_Created_By_Terraform.png)
-   ![Install_DevOps_Agent.png](screenshots/Install_DevOps_Agent.png)
-   ![Run_Terraform_In_Pipelines_Success.png](screenshots/Run_Terraform_In_Pipelines_Success.png)
-   ![Terraform_State.png](screenshots/Terraform_State.png)
+   ![Resources_Created_By_Terraform.png](screenshot/Resources_Created_By_Terraform.png)
+   ![Install_DevOps_Agent.png](screenshot/Install_DevOps_Agent.png)
+   ![Run_Terraform_In_Pipelines_Success.png](screenshot/Run_Terraform_In_Pipelines_Success.png)
+   ![Terraform_State.png](screenshot/Terraform_State.png)
 
 - Automated testing tasks
   - Screenshot of the successful execution of the pipeline build results page (/_build/results?buildId={id}&view=results)
-    ![Complete_Final_Pipeline.png](screenshots/Complete_Final_Pipeline.png)
+    ![Complete_Final_Pipeline.png](screenshot/Complete_Final_Pipeline.png)
 
 ## Automated Testing
 
 - Load test suite 
   - Screenshot of the log output of JMeter when executed by the CI/CD pipeline
-    ![Load_Tests_Result_1.png](screenshots/Load_Tests_Result_1.png)
-    ![Load_Tests_Result_2.png](screenshots/Load_Tests_Result_2.png)
+    ![Load_Tests_Result_1.png](screenshot/Load_Tests_Result_1.png)
+    ![Load_Tests_Result_2.png](screenshot/Load_Tests_Result_2.png)
   
 - Functional test suites 
   - Screenshot of the execution of the test suite by the CI/CD pipeline
-   ![Functional_Tests_Result.png](screenshots/Screenshot_7_Functional_Tests_Result.png)
+   ![Functional_Tests_Result.png](screenshot/Functional_Tests_Result.png)
 
 - API-integration tests
   - Screenshot of the output of the Publish Test Results step
-    ![Public_Tests_Result.png](screenshots/Public_Tests_Result.png)
+    ![Public_Tests_Result.png](screenshot/Public_Tests_Result.png)
   - Screenshot of the Run Summary page (which contains 4 graphs)
-    ![Test_Report_Summary.png](screenshots/Test_Report_Summary.png)
+    ![Test_Report_Summary.png](screenshot/Test_Report_Summary.png)
   - Screenshot of the Test Results page (which contains the test case titles from each test) 
-    ![Test_Report_Results.png](screenshots/Test_Report_Results.png)
+    ![Test_Report_Results.png](screenshot/Test_Report_Results.png)
 
 ## Monitoring & Observability
 
 - Configure Azure Monitor
   - Screenshots of the graphs of the resource that the alert was triggered
-    ![Alert_Summary.png](screenshots/Screenshot_11_Alert_Summary.png)
+    ![Alert_Summary.png](screenshot/Alert_Summary.png)
   - Screenshots of the alert rule
-    ![Alert_Rule.png](screenshots/Alert_Rule.png)
-    ![AppService_Alerts.png](screenshots/Screenshot_13_AppService_Alerts.png)
+    ![Alert_Rule.png](screenshot/Alert_Rule.png)
   - Screenshots of the email received when the alert is triggered
-    ![Alert_Email.png](screenshots/Alert_Email.png)
+    ![Alert_Email.png](screenshot/Alert_Email.png)
 
     Note: if you udacity account lab, when run terraform apply in pipeline very long time because resourec group locked you need unlock follow step in local:
 
