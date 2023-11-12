@@ -14,21 +14,28 @@ def create_driver():
     print ('Starting the browser...')
     options = ChromeOptions()
     options.add_argument("--headless") 
-    return webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options)
+    driver.implicitly_wait(10)  # Add an implicit wait to give time for elements to load
+    return driver
     
 
 # Start the browser and login with standard_user
-def test_login (driver, user, password):
-    print ('Test: login. Navigating to the demo page to login {}'.format(login_url))
+def test_login(driver, user, password):
+    print('Test: login. Navigating to the demo page to login {}'.format(login_url))
     driver.get(login_url)
-    print ('Login attempt, user: {},  password: {}'.format(user, password))
-    driver.find_element_by_id('user-name').send_keys(user)
-    driver.find_element_by_id('password').send_keys(password)
-    driver.find_element_by_id('login-button').click()
-    #print ('Assert in inventory page. ')
+    print('Login attempt, user: {},  password: {}'.format(user, password))
+    
+    # Use implicit wait to wait for elements to load
+    user_element = driver.find_element_by_id('user-name')
+    password_element = driver.find_element_by_id('password')
+    login_button_element = driver.find_element_by_id('login-button')
+
+    user_element.send_keys(user)
+    password_element.send_keys(password)
+    login_button_element.click()
+
     assert inventory_url in driver.current_url
-    #print ('User successfully logged in.')
-    print ('Test Login Success.')
+    print('Test Login Success.')
     
 
 def test_add_items_to_cart(driver):
