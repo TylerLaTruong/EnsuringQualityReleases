@@ -146,17 +146,23 @@ stages:
                 pip3 install selenium
 
                 # download chrome driver
-                FILE=chromedriver_linux64.zip
-                if [ -f "$FILE" ]; then
-                  echo "$FILE exists."
+                CHROMIUM_VERSION=$(chromium-browser --version | awk '{print $NF}' | sed 's/\.//g')
+                CHROMEDRIVER_VERSION="2.41"
+                CHROMEDRIVER_URL="https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+                CHROMEDRIVER_FILE="chromedriver_linux64.zip"
+                if [ -f "$CHROMEDRIVER_FILE" ]; then
+                echo "$CHROMEDRIVER_FILE exists."
                 else
-                  wget https://chromedriver.storage.googleapis.com/119.0.6045.123/chromedriver_linux64.zip
+                  wget "$CHROMEDRIVER_URL"
                 fi
                 # install chrome driver
-                unzip chromedriver_linux64.zip
-                sudo mv chromedriver /usr/bin/chromedriver
-                sudo chown root:root /usr/bin/chromedriver
-                sudo chmod +x /usr/bin/chromedriver
+                unzip "$CHROMEDRIVER_FILE"
+                sudo mv chromedriver "/usr/bin/chromedriver-$CHROMIUM_VERSION"
+                sudo chown root:root "/usr/bin/chromedriver-$CHROMIUM_VERSION"
+                sudo chmod +x "/usr/bin/chromedriver-$CHROMIUM_VERSION"
+                # Link to the installed Chromedriver
+                sudo ln -fs "/usr/bin/chromedriver-$CHROMIUM_VERSION" /usr/bin/chromedriver
+                # Display Chromium version and Chromedriver version
                 chromium-browser -version
                 chromedriver --version
                 # install Log Analytics Agent
