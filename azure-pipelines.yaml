@@ -138,7 +138,7 @@ stages:
               targetType: 'inline'
               script: |
                 pip3 install selenium
-                wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/119.0.6045.105/linux64/chromedriver-linux64.zip
+                wget https://chromedriver.storage.googleapis.com/85.0.4183.83/chromedriver_linux64.zip
                 unzip chromedriver_linux64.zip 
                 sudo chmod +x ./chromedriver
                 # install Log Analytics Agent
