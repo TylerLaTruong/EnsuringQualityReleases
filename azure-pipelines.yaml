@@ -138,7 +138,6 @@ stages:
               targetType: 'inline'
               script: |
                 #! /bin/bash
-
                 sudo apt-get upgrade -y
                 sudo apt-get install python3-pip -y
                 sudo apt-get install unzip -y
@@ -147,10 +146,8 @@ stages:
 
                 # download chrome driver
                 FILE=chromedriver_linux64.zip
-                if [ -f "$FILE" ]; then
-                  echo "$FILE exists."
-                else
-                  wget https://chromedriver.storage.googleapis.com/85.0.4183.83/chromedriver_linux64.zip
+                if [ -f "$FILE" ]; then echo "$FILE exists."
+                else wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
                 fi
                 # install chrome driver
                 unzip chromedriver_linux64.zip
@@ -225,39 +222,37 @@ stages:
 
 - stage: JMeterTests
   jobs:
-  - job: JMeterTests
-    pool:
-        vmImage: 'ubuntu-latest'
-        steps:
-            - task: UseJavaVersion@0
-              inputs:
-                versionSpec: '11'
-                addToPath: true
-        
-            - task: Bash@3
-              displayName: EnduranceTest
-              inputs:
-                targetType: 'inline'
-                script: 'java -version'
-        
-            - task: JMeterInstaller@0
-              inputs:
-                jmeterVersion: '5.2.1'
-        
-            - task: Bash@3
-              displayName: EnduranceTest
-              inputs:
-                targetType: 'inline'
-                script: 'jmeter -n -t automatedtesting/jmeter/EnduranceTestSuite.jmx -Jresdir=automatedtesting/jmeter/endurancepages.csv -l automatedtesting/jmeter/report/enduranceresults.jtl -e -o automatedtesting/jmeter/endurancereport'
-        
-            - task: Bash@3
-              displayName: StressTest
-              inputs:
-                targetType: 'inline'
-                script: 'jmeter -n -t automatedtesting/jmeter/StressTestSuite.jmx -Jresdir=automatedtesting/jmeter/stresspages.csv -l automatedtesting/jmeter/report/stressresults.jtl -e -o automatedtesting/jmeter/stressreport'
-        
-            - task: PublishBuildArtifacts@1
-              inputs:
-                PathtoPublish: 'automatedtesting/jmeter'
-                ArtifactName: 'drop-fakerestapi'
-                publishLocation: 'Container'
+    - job: Test_Jmeter
+      displayName: Performance testing
+      pool:
+        name: Azure Pipelines
+      steps:
+      - bash: |
+          sudo apt-get install openjdk-11-jre-headless -y
+          java -version
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.5.tgz -O jmeter.tgz
+          tar xzvf jmeter.tgz
+          echo "####################"
+          echo "jmeter version : " 
+          apache-jmeter-5.5/bin/jmeter --version   
+          echo "####################"
+          mkdir -p log/jmeter
+          pwd
+          ls -la
+          ls '$(Pipeline.Workspace)/s'
+        displayName: Install JMeter
+      - bash: |
+          apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/StressTest.jmx -l log/jmeter/stress-test-result.csv -e -f -o log/jmeter/stress-test-html-report -j log/jmeter/jmeter-stress-test.log
+          cat log/jmeter/jmeter-stress-test.log
+          ls '$(Pipeline.Workspace)/s'
+          ls '$(Pipeline.Workspace)/s/automatedtesting/jmeter'
+        displayName: Stress Test
+      - bash: |
+          apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/EnduranceTest.jmx -l log/jmeter/endurance-test-result.csv -e -f -o log/jmeter/endurance-test-html-report -j log/jmeter/jmeter-endurance-test.log
+          cat log/jmeter/jmeter-endurance-test.log
+        displayName: Endurance Test
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'log/jmeter'
+          ArtifactName: 'jmeter'
+          publishLocation: 'Container'  
