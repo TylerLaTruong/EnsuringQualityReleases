@@ -58,23 +58,17 @@ def test_add_items_to_cart(driver):
 
 def test_remove_items_from_cart(driver):
     print ('Test: removing items from cart')
-    #print ('Navigate to cart and assert items in cart.')
-    driver.find_elements(By.CLASS_NAME, 'shopping_cart_link').click()
-    #print ('Assert in cart page.')
+    driver.find_element(By.CLASS_NAME, 'shopping_cart_link').click()
     assert cart_url in driver.current_url
 
     print("Items in Cart: {}".format(len(driver.find_elements(By.CLASS_NAME, 'cart_item'))))
     
-    #print('Remove all items from cart.')
     for item in driver.find_elements(By.CLASS_NAME, 'cart_item'):
-        item_name = item.find_elements(By.CLASS_NAME, 'inventory_item_name').text
-        item.find_elements(By.CLASS_NAME, 'cart_button').click()
+        item_name = item.find_element(By.CLASS_NAME, 'inventory_item_name').text
+        item.find_element(By.CLASS_NAME, 'cart_button').click()
         print('Removed {} from cart'.format(item_name))
 
-    #print('Assert cart is empy')
-    #print("Items in Cart: {}".format(len(driver.find_elements_by_class_name('cart_item'))))
     assert len(driver.find_elements(By.CLASS_NAME, 'cart_item')) == 0
-    #print('Cart empty.')
     print ('Test Remove Items from cart Success.')
 
 
