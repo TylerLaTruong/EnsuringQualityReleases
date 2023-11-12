@@ -10,7 +10,7 @@ variables:
   projectRoot: $(System.DefaultWorkingDirectory)
   environmentName: 'linux-vm'
   poolName: 'newAgentPool'
-  appName: 'devops-truonglv9-web-app'
+  appName: 'myapplicationtruonglv9-app-service'
 
 pool: 
   name: '$(poolName)'
