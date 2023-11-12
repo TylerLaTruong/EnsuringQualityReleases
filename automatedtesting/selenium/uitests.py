@@ -42,7 +42,7 @@ def test_login(driver, user, password):
 def test_add_items_to_cart(driver):
     items_in_cart = []
     print ('Test: adding items to cart')
-    elements = driver.find_elements(By.CLASS_NAME, 'inventory_item')()
+    elements = driver.find_elements(By.CLASS_NAME, 'inventory_item')
     #print('Total items to add: {}'.format(len(elements)))
     for item in elements:
         item_name = item.find_elements(By.CLASS_NAME, 'inventory_item_name').text

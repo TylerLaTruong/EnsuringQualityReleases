@@ -229,7 +229,7 @@ stages:
       steps:
         - task: JMeterInstaller@0
           inputs:
-            jmeterVersion: '5.2.1'
+            jmeterVersion: '5.5'
         - task: Bash@3
           displayName: EnduranceTest
           inputs:
