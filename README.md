@@ -1,5 +1,3 @@
-[![Build Status](https://dev.azure.com/odluser242834/UdacityAzureDevOps3/_apis/build/status%2Fhoankhai811.Ensuring-Quality-Releases-Project?branchName=main)](https://dev.azure.com/odluser242834/UdacityAzureDevOps3/_build/latest?definitionId=4&branchName=main)
-
 # Overview
 
 Udacity final project Ensuring Quality Releases
@@ -57,10 +55,6 @@ Udacity final project Ensuring Quality Releases
     ![AppService_Alerts.png](screenshots/Screenshot_13_AppService_Alerts.png)
   - Screenshots of the email received when the alert is triggered
     ![Alert_Email.png](screenshots/Alert_Email.png)
-
-- Azure Log Analytics
-  - Screenshots of log analytics queries and result sets which will show specific output of the Azure resource
-    ![LogAnalytics_Queries.png](screenshots/LogAnalytics_Queries.png)
 
     Note: if you udacity account lab, when run terraform apply in pipeline very long time because resourec group locked you need unlock follow step in local:
 
