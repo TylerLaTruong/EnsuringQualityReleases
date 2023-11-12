@@ -43,25 +43,18 @@ def test_add_items_to_cart(driver):
     items_in_cart = []
     print ('Test: adding items to cart')
     elements = driver.find_elements(By.CLASS_NAME, 'inventory_item')
-    #print('Total items to add: {}'.format(len(elements)))
     for item in elements:
-        item_name = item.find_elements(By.CLASS_NAME, 'inventory_item_name').text
+        item_name = item.find_element(By.CLASS_NAME, 'inventory_item_name').text
         items_in_cart.append(item_name)
-        item.find_elements(By.CLASS_NAME, 'btn_inventory').click()
+        item.find_element(By.CLASS_NAME, 'btn_inventory').click()
         print('Added {} to cart'.format(item_name))
-    #print ('Assert in cart icon to reflect {} items added.'.format(len(elements)))
-    cart_element = driver.find_elements(By.CLASS_NAME, 'shopping_cart_badge')
+    cart_element = driver.find_element(By.CLASS_NAME, 'shopping_cart_badge')
     assert int(cart_element.text) == len(elements)
-    #print ('Navigate to cart and assert items in cart.')
-    driver.find_elements(By.CLASS_NAME, 'shopping_cart_link').click()
-    #print ('Assert in cart page. ')
+    driver.find_element(By.CLASS_NAME, 'shopping_cart_link').click()
     assert cart_url in driver.current_url
-    #print ('Assert items in cart. ')
     for item in driver.find_elements(By.CLASS_NAME, 'inventory_item_name'):
         assert item.text in items_in_cart
-    #print ('Asserted items in cart ') 
     print ('Test Add Items in cart Success.')
-
 
 def test_remove_items_from_cart(driver):
     print ('Test: removing items from cart')
