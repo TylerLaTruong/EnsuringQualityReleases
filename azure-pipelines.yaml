@@ -183,9 +183,9 @@ stages:
                       script: |
                           unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-ui-tests.zip -d .
                           sudo mkdir -p /var/logs
-                          python3 uitests.py > ui-logs.log
-                          cat ui-logs.log
-                          sudo mv ui-logs.log /var/logs
+                          python3 uitests.py > "selelium$(date '+%Y%m%d').log"
+                          cat "selelium$(date '+%Y%m%d').log"
+                          sudo mv "selelium$(date '+%Y%m%d').log" /var/logs
 
 - stage: PostmanTests
   jobs:
