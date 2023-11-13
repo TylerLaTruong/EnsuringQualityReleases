@@ -22,9 +22,9 @@ def create_driver():
 
 # Start the browser and login with standard_user
 def test_login(driver, user, password):
-    print(f'{datenow} Test: login. Navigating to the demo page to login {}'.format(login_url))
+    print(f'{datenow} Test: login. Navigating to the demo page to login {login_url}')
     driver.get(login_url)
-    print(f'{datenow} Login attempt, user: {},  password: {}'.format(user, password))
+    print(f'{datenow} Login attempt, user: {user}, password: {password}')
     
     # Use implicit wait to wait for elements to load
     user_element = driver.find_element(By.ID, 'user-name')
@@ -47,7 +47,8 @@ def test_add_items_to_cart(driver):
         item_name = item.find_element(By.CLASS_NAME, 'inventory_item_name').text
         items_in_cart.append(item_name)
         item.find_element(By.CLASS_NAME, 'btn_inventory').click()
-        print(f'{datenow} Added {} to cart'.format(item_name))
+        print(f'{datenow} Added {item_name} to cart')
+        
     cart_element = driver.find_element(By.CLASS_NAME, 'shopping_cart_badge')
     assert int(cart_element.text) == len(elements)
     driver.find_element(By.CLASS_NAME, 'shopping_cart_link').click()
@@ -61,12 +62,12 @@ def test_remove_items_from_cart(driver):
     driver.find_element(By.CLASS_NAME, 'shopping_cart_link').click()
     assert cart_url in driver.current_url
 
-    print(f"{datenow} Items in Cart: {}".format(len(driver.find_elements(By.CLASS_NAME, 'cart_item'))))
+    print(f"{datenow} Items in Cart: {len(driver.find_elements(By.CLASS_NAME, 'cart_item'))}")
     
     for item in driver.find_elements(By.CLASS_NAME, 'cart_item'):
         item_name = item.find_element(By.CLASS_NAME, 'inventory_item_name').text
         item.find_element(By.CLASS_NAME, 'cart_button').click()
-        print(f'{datenow} Removed {} from cart'.format(item_name))
+        print(f'{datenow} Removed {item_name} from cart')
 
     assert len(driver.find_elements(By.CLASS_NAME, 'cart_item')) == 0
     print (f'{datenow} Test Remove Items from cart Success.')
