@@ -12,7 +12,7 @@ inventory_url = 'https://www.saucedemo.com/inventory.html'
 cart_url = 'https://www.saucedemo.com/cart.html'
 
 def create_driver():
-    print ('{datenow} Starting the browser...')
+    print (f'{datenow} Starting the browser...')
     options = ChromeOptions()
     options.add_argument("--headless") 
     driver = webdriver.Chrome(options=options)
@@ -22,9 +22,9 @@ def create_driver():
 
 # Start the browser and login with standard_user
 def test_login(driver, user, password):
-    print('Test: login. Navigating to the demo page to login {}'.format(login_url))
+    print(f'{datenow} Test: login. Navigating to the demo page to login {}'.format(login_url))
     driver.get(login_url)
-    print('{datenow} Login attempt, user: {},  password: {}'.format(user, password))
+    print(f'{datenow} Login attempt, user: {},  password: {}'.format(user, password))
     
     # Use implicit wait to wait for elements to load
     user_element = driver.find_element(By.ID, 'user-name')
@@ -36,46 +36,46 @@ def test_login(driver, user, password):
     login_button_element.click()
 
     assert inventory_url in driver.current_url
-    print('Test Login Success.')
+    print(f'{datenow} Test Login Success.')
     
 
 def test_add_items_to_cart(driver):
     items_in_cart = []
-    print ('Test: adding items to cart')
+    print (f'{datenow} Test: adding items to cart')
     elements = driver.find_elements(By.CLASS_NAME, 'inventory_item')
     for item in elements:
         item_name = item.find_element(By.CLASS_NAME, 'inventory_item_name').text
         items_in_cart.append(item_name)
         item.find_element(By.CLASS_NAME, 'btn_inventory').click()
-        print('{datenow} Added {} to cart'.format(item_name))
+        print(f'{datenow} Added {} to cart'.format(item_name))
     cart_element = driver.find_element(By.CLASS_NAME, 'shopping_cart_badge')
     assert int(cart_element.text) == len(elements)
     driver.find_element(By.CLASS_NAME, 'shopping_cart_link').click()
     assert cart_url in driver.current_url
     for item in driver.find_elements(By.CLASS_NAME, 'inventory_item_name'):
         assert item.text in items_in_cart
-    print ('{datenow} Test Add Items in cart Success.')
+    print (f'{datenow} Test Add Items in cart Success.')
 
 def test_remove_items_from_cart(driver):
     print ('Test: removing items from cart')
     driver.find_element(By.CLASS_NAME, 'shopping_cart_link').click()
     assert cart_url in driver.current_url
 
-    print("{datenow} Items in Cart: {}".format(len(driver.find_elements(By.CLASS_NAME, 'cart_item'))))
+    print(f"{datenow} Items in Cart: {}".format(len(driver.find_elements(By.CLASS_NAME, 'cart_item'))))
     
     for item in driver.find_elements(By.CLASS_NAME, 'cart_item'):
         item_name = item.find_element(By.CLASS_NAME, 'inventory_item_name').text
         item.find_element(By.CLASS_NAME, 'cart_button').click()
-        print('{datenow} Removed {} from cart'.format(item_name))
+        print(f'{datenow} Removed {} from cart'.format(item_name))
 
     assert len(driver.find_elements(By.CLASS_NAME, 'cart_item')) == 0
-    print ('{datenow} Test Remove Items from cart Success.')
+    print (f'{datenow} Test Remove Items from cart Success.')
 
 
 def run_ui_tests():
     driver = create_driver()
     #print("Browser started successfully.")
-    print("{datenow} UI Tests started")
+    print(f"{datenow} UI Tests started")
     
     print("####################################### - test login user")
     test_login(driver, 'standard_user', 'secret_sauce')
@@ -84,7 +84,7 @@ def run_ui_tests():
     print("####################################### - test remove items from cart")
     test_remove_items_from_cart(driver)
 
-    print("{datenow} UI Tests completed.")
+    print(f"{datenow} UI Tests completed.")
     driver.quit()
 
 if __name__ == "__main__":
