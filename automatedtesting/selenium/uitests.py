@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 
-datenow = datetime.now().strftime("%m-%d-%y %H:%M:%S")
+datenow = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 login_url = 'https://www.saucedemo.com/'
 inventory_url = 'https://www.saucedemo.com/inventory.html'
@@ -58,7 +58,7 @@ def test_add_items_to_cart(driver):
     print (f'{datenow} Test Add Items in cart Success.')
 
 def test_remove_items_from_cart(driver):
-    print ('Test: removing items from cart')
+    print (f'{datenow} Test: removing items from cart')
     driver.find_element(By.CLASS_NAME, 'shopping_cart_link').click()
     assert cart_url in driver.current_url
 
@@ -77,12 +77,8 @@ def run_ui_tests():
     driver = create_driver()
     #print("Browser started successfully.")
     print(f"{datenow} UI Tests started")
-    
-    print("####################################### - test login user")
     test_login(driver, 'standard_user', 'secret_sauce')
-    print("####################################### - test add items to cart")
     test_add_items_to_cart(driver)
-    print("####################################### - test remove items from cart")
     test_remove_items_from_cart(driver)
 
     print(f"{datenow} UI Tests completed.")
